@@ -1,0 +1,116 @@
+## this is the all-in-one, standalone Discourse Docker container template
+##
+## After making changes to this file, you MUST rebuild
+## /var/discourse/launcher rebuild app
+##
+## BE *VERY* CAREFUL WHEN EDITING!
+## YAML FILES ARE SUPER SUPER SENSITIVE TO MISTAKES IN WHITESPACE OR ALIGNMENT!
+## visit http://www.yamllint.com/ to validate this file as needed
+
+templates:
+  - "templates/web.template.yml"
+  - "templates/web.ratelimited.template.yml"
+
+expose:
+  - "80:80"
+
+params:
+  db_default_text_search_config: "pg_catalog.english"
+  db_shared_buffers: "1024MB"
+  version: stable
+
+env:
+  LC_ALL: en_US.UTF-8
+  LANG: en_US.UTF-8
+  LANGUAGE: en_US.UTF-8
+  UNICORN_WORKERS: 4
+  DISCOURSE_HOSTNAME: '${DISCOURSE_HOSTNAME}'
+  DISCOURSE_DEVELOPER_EMAILS: '${DISCOURSE_DEVELOPER_EMAILS}'
+
+  ## TODO: The SMTP mail server used to validate new accounts and send notifications
+  # SMTP ADDRESS, username, and password are required
+  # WARNING the char '#' in SMTP password can cause problems!
+  # If you end up having issues with initial SMTP and would like to override and login with an admin
+  # Log into an EC2 instance created and do the following
+  # sudo -s
+  # cd /var/discourse
+  # ./launcher enter app
+  # rake admin:create
+  DISCOURSE_SMTP_ADDRESS: '${DISCOURSE_SMTP_ADDRESS}'
+  DISCOURSE_SMTP_PORT: ${DISCOURSE_SMTP_PORT}
+  DISCOURSE_SMTP_USER_NAME: '${DISCOURSE_SMTP_USER_NAME}'
+  DISCOURSE_SMTP_PASSWORD: '${DISCOURSE_SMTP_PASSWORD}'
+  DISCOURSE_SMTP_ENABLE_START_TLS: true
+  DISCOURSE_SMTP_DOMAIN: '${DISCOURSE_SMTP_DOMAIN}'
+  DISCOURSE_NOTIFICATION_EMAIL: '${DISCOURSE_NOTIFICATION_EMAIL}'
+
+  ## The http or https CDN address for this Discourse instance (configured to pull)
+  ## see https://meta.discourse.org/t/14857 for details
+  ## Potential to setup another CloudFront Distribution pointing at the ALB which would set this value
+  DISCOURSE_CDN_URL: 'https://${DISCOURSE_CDN_URL}'
+
+  ## DISCOURSE RDS Postgres DB Connection
+  DISCOURSE_DB_USERNAME: '${DISCOURSE_DB_USERNAME}'
+  DISCOURSE_DB_PASSWORD: '${DISCOURSE_DB_PASSWORD}'
+  DISCOURSE_DB_HOST: '${DISCOURSE_DB_HOST}'
+  DISCOURSE_DB_NAME: '${DISCOURSE_DB_NAME}'
+  DISCOURSE_DB_PORT: ${DISCOURSE_DB_PORT}
+
+  ## AWS Elasticsearch Redis connection
+  DISCOURSE_REDIS_HOST: '${DISCOURSE_REDIS_HOST}'
+
+  DISCOURSE_ENABLE_CORS: true
+
+  DISCOURSE_S3_REGION: '${DISCOURSE_S3_REGION}'
+  DISCOURSE_S3_UPLOAD_BUCKET: '${DISCOURSE_S3_UPLOAD_BUCKET}'
+  DISCOURSE_S3_BACKUP_BUCKET: '${DISCOURSE_S3_BACKUP_BUCKET}'
+  DISCOURSE_S3_BUCKET: '${DISCOURSE_S3_BUCKET}'
+  DISCOURSE_BACKUP_LOCATION: 's3'
+  DISCOURSE_ENABLE_S3_UPLOADS: true
+  DISCOURSE_S3_USE_IAM_PROFILE: true
+  DISCOURSE_S3_CDN_URL: 'https://${DISCOURSE_S3_CDN_URL}'
+  DISCOURSE_USE_S3: true
+
+  DISCOURSE_OPENID_CONNECT_ENABLED: ${DISCOURSE_OPENID_CONNECT_ENABLED}
+  DISCOURSE_OPENID_CONNECT_CLIENT_ID: '${DISCOURSE_OPENID_CONNECT_CLIENT_ID}'
+  DISCOURSE_OPENID_CONNECT_CLIENT_SECRET: '${DISCOURSE_OPENID_CONNECT_CLIENT_SECRET}'
+  DISCOURSE_OPENID_CONNECT_DISCOVERY_DOCUMENT: '${DISCOURSE_OPENID_CONNECT_DISCOVERY_DOCUMENT}'
+
+  DISCOURSE_ADMIN_EMAIL: '${DISCOURSE_ADMIN_EMAIL}'
+  DISCOURSE_ADMIN_PASSWORD: '${DISCOURSE_ADMIN_PASSWORD}'
+  DISCOURSE_ADMIN_USERNAME: '${DISCOURSE_ADMIN_USERNAME}'
+
+## The Docker container is stateless; all data is stored in /shared
+volumes:
+  - volume:
+      host: /var/discourse/shared/standalone
+      guest: /shared
+  - volume:
+      host: /var/discourse/shared/standalone/log/var-log
+      guest: /var/log
+
+## Plugins go here
+## see https://meta.discourse.org/t/19157 for details
+hooks:
+  before_code:
+    - exec:
+        cmd:
+          - mkdir -p plugins
+  after_code:
+    - exec:
+        cd: $home/plugins
+        cmd:
+          - git clone https://github.com/discourse/docker_manager.git
+          - git clone https://github.com/discourse/discourse-openid-connect.git
+  after_assets_precompile:
+    - exec:
+        cd: $home
+        cmd:
+          - bundle exec rake s3:upload_assets
+
+## Any custom commands to run after building
+run:
+  ## If you want to set the 'From' email address for your first registration, uncomment and change:
+  ## After getting the first signup email, re-comment the line. It only needs to run once.
+  #- exec: rails r "SiteSetting.notification_email='info@unconfigured.discourse.org'"
+  - exec: echo "End of custom commands"
