@@ -68,18 +68,18 @@ aws s3control put-public-access-block \
 
 ## Notes
 1. You can log into EC2 instance via Session Manager
-2. Once logged in you require `sudo -s`, then the Discourse install will be located at `/var/discourse`
-3. A helpers script is available via running `. discourse-env` in the `/var/discourse` folder if you which to execute any commands in the current shell session
-4. To check if the docker is running execute the command `docker ps`
-5. EC2 instance startup logs are located at `/var/log/cloud-init-output.log` and can be helpful to determine the actions taken by the user data startup script. This may also contain any errors that occurred on startup.
-6. You can run various docker commands via the Discourse helper script `./launcher {command} app`
+2. Once logged in you require `sudo -s` for most commands
+3. Discourse is installed in the folder `/var/discourse`
+4. Running `. discourse-env` in the `/var/discourse` folder will setup the current shell session environment variables
+5. To check if the docker is running execute the command `docker ps`
+6. EC2 instance startup logs are located at `/var/log/cloud-init-output.log` and can be helpful to determine the actions taken by the user data startup script. 
+   1. This log may also contain any errors that occurred on startup.
+7. You can run various docker commands via the Discourse helper script `./launcher {command} app`
     1. For instance `./launcher enter app` will put your into the docker instance shell
     2. `./launcher logs app` will display the logs
-7. Unless your account simple email service is validated for production it will only send any emails to email addresses which are verified. Via the console
-   you can add your own email to the verify list which sends you an email to validate. Once we have the saasbuilders.com
-   domain we can request production SES to remove this limitation.
-
-
+8. Your accounts SES (simple email service) will only send email to verified addresses unless validated for production.
+   1. Via the console you can add your own email to the verified list.
+   
 ## Resource Cleanup
 ### CloudFormation
 1. From the <b>cdk</b> folder run <b>cdk destroy</b>
