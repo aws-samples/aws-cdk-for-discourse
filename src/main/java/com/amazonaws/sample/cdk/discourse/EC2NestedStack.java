@@ -227,7 +227,7 @@ public class EC2NestedStack extends NestedStack {
     private void addTargetGroupsToLoadBalancer(final String httpsListenerArn, final SecurityGroup loadBalancerSecurityGroup,
                                                final String customCloudFrontALBHeaderCheckHeader, final String customCloudFrontALBHeaderCheckValue,
                                                final String id) {
-        IApplicationListener httpsListener = ApplicationListener.fromApplicationListenerAttributes(this, "DiscourseHttpsListener", ApplicationListenerAttributes.builder()
+        IApplicationListener httpsListener = ApplicationListener.fromApplicationListenerAttributes(this, id + "DiscourseHttpsListener", ApplicationListenerAttributes.builder()
                 .listenerArn(httpsListenerArn)
                 .securityGroup(loadBalancerSecurityGroup)
                 .build());
