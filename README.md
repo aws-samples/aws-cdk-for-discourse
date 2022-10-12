@@ -38,7 +38,7 @@ aws s3control put-public-access-block \
 
 ## Setup
 1. Git clone this repository
-2. Create an AWS Secrets Manager [secret](https://docs.aws.amazon.com/secretsmanager/latest/userguide/create_secret.html) with the following key values
+2. Create an AWS Secrets Manager [secret](https://docs.aws.amazon.com/secretsmanager/latest/userguide/create_secret.html) with the following key value pairs
     1. DOCKER_USER - A docker login user (required for docker pull quota)
     2. DOCKER_PASSWORD - A docker login password
     3. DISCOURSE_ADMIN_EMAIL - The email address for the initial admin user
@@ -62,7 +62,7 @@ aws s3control put-public-access-block \
     14. CDK_DEPLOY_DISCOURSE_CLOUDFRONT_ALB_HEADER_CHECK_VALUE - The header value use to restrict access to the ALB from just CloudFront. If this environment variable is not found a default value of 'c9fd4d17-24a6-463f-b470-1c4347253245' is used.
 4. Before performing any cdk action run the environment setup
     1. `. setenv-{name}` to set all required environment variables for you current session
-5. Run `cd deploy` to deploy into your account
+5. Run `cdk deploy` to deploy into your account
 6. It takes approx. 15-20 minutes AFTER the discourse EC2 instance is created for the full discourse setup to complete and be available
     1. The EC2 instance will set up the database structure and push assets to the S3 bucket prior to starting up the Discourse server
 
