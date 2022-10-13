@@ -1,15 +1,11 @@
-.classpath.txt
-target
-.classpath
-.project
-.idea
-.settings
-.vscode
-*.iml
+*.js
+!jest.config.js
+*.d.ts
+node_modules
 cdk.context.json
 .DS_Store
+.idea
 
 # CDK asset staging directory
 .cdk.staging
 cdk.out
-

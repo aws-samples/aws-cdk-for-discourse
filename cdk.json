@@ -1,5 +1,5 @@
 {
-  "app": "mvn -e -q compile exec:java",
+  "app": "npx ts-node --prefer-ts-exts bin/discourse.ts",
   "watch": {
     "include": [
       "**"
@@ -7,9 +7,13 @@
     "exclude": [
       "README.md",
       "cdk*.json",
-      "target",
-      "pom.xml",
-      "src/test"
+      "**/*.d.ts",
+      "**/*.js",
+      "tsconfig.json",
+      "package*.json",
+      "yarn.lock",
+      "node_modules",
+      "test"
     ]
   },
   "context": {
