@@ -48,7 +48,7 @@ aws s3control put-public-access-block \
 3. Edit the cdk-command.sh with information required
     1. CDK_DEPLOY_DISCOURSE_ACCOUNT - The AWS account used for this deployment
     2. CDK_DEPLOY_DISCOURSE_REGION - The AWS region used for this deployment
-    3. CDK_DEPLOY_DISCOURSE_STACK_ID - The stack id can be modified to allow for CI/CD and multiple different deployments
+    3. CDK_DEPLOY_DISCOURSE_STACK_ID - The stack id can be modified to allow for CI/CD and multiple different deployments. If not value is set the default value of 'Discourse' is used.
     4. CDK_DEPLOY_DISCOURSE_HOSTED_ZONE_ID - The Route 53 hosted zone id
     5. CDK_DEPLOY_DISCOURSE_HOSTED_ZONE_NAME - The Route 53 hosted zone name
     6. CDK_DEPLOY_DISCOURSE_DOMAIN_NAME - The domain name to use for this instance of discourse for example 'discourse.example.com'
