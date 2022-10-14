@@ -45,7 +45,7 @@ aws s3control put-public-access-block \
     4. DISCOURSE_ADMIN_PASSWORD - The password for the initial admin user
     5. DISCOURSE_ADMIN_USERNAME - The username for the initial discourse user
         1. Note this is a discourse login and not linked to cognito. This is required when setting up discourse
-3. Copy the setenv-template to setevn-{name} and edit the setenv-{name} file with information required
+3. Edit the cdk-command.sh with information required
     1. CDK_DEPLOY_DISCOURSE_ACCOUNT - The AWS account used for this deployment
     2. CDK_DEPLOY_DISCOURSE_REGION - The AWS region used for this deployment
     3. CDK_DEPLOY_DISCOURSE_STACK_ID - The stack id can be modified to allow for CI/CD and multiple different deployments
@@ -60,17 +60,15 @@ aws s3control put-public-access-block \
     12. CDK_DEPLOY_DISCOURSE_CIDR - The CIDR block to use when creating the VPC
     13. CDK_DEPLOY_DISCOURSE_CLOUDFRONT_ALB_HEADER_CHECK_HEADER - This header name is used to [restrict access](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/restrict-access-to-load-balancer.html) to the ALB from just CloudFront. If this environment variable is not found a default value of 'X-Discourse-ALB-Check' is used.
     14. CDK_DEPLOY_DISCOURSE_CLOUDFRONT_ALB_HEADER_CHECK_VALUE - The header value use to restrict access to the ALB from just CloudFront. If this environment variable is not found a default value of 'c9fd4d17-24a6-463f-b470-1c4347253245' is used.
-4. Before performing any cdk action run the environment setup
-    1. `. setenv-{name}` to set all required environment variables for you current session
-5. Run `cdk deploy` to deploy into your account
-6. It takes approx. 15-20 minutes AFTER the discourse EC2 instance is created for the full discourse setup to complete and be available
+4. Run `./cdk-command.sh deploy` to deploy into your account
+5. It takes approx. 15-20 minutes AFTER the discourse EC2 instance is created for the full discourse setup to complete and be available
     1. The EC2 instance will set up the database structure and push assets to the S3 bucket prior to starting up the Discourse server
 
 ## Notes
 1. You can log into EC2 instance via Session Manager
 2. Once logged in you require `sudo -s` for most commands
 3. Discourse is installed in the folder `/var/discourse`
-4. Running `. discourse-env` in the `/var/discourse` folder will setup the current shell session environment variables
+4. Running `. discourse-env` in the `/var/discourse` folder will set up the current shell session environment variables
 5. To check if the docker is running execute the command `docker ps`
 6. EC2 instance startup logs are located at `/var/log/cloud-init-output.log` and can be helpful to determine the actions taken by the user data startup script. 
    1. This log may also contain any errors that occurred on startup.
@@ -82,7 +80,7 @@ aws s3control put-public-access-block \
    
 ## Resource Cleanup
 ### CloudFormation
-1. From the <b>root</b> folder for this project run <b>cdk destroy</b>
+1. From the <b>root</b> folder for this project run <b>`./cdk-command.sh destroy`</b>
 
 ## Security
 

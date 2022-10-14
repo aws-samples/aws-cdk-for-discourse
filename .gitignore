@@ -5,6 +5,7 @@ node_modules
 cdk.context.json
 .DS_Store
 .idea
+cdk-command-*
 
 # CDK asset staging directory
 .cdk.staging
