@@ -1,8 +1,8 @@
 # AWS CDK For Discourse
 
 This sample demonstrates how to create a full environment for the open source forum tool [Discourse](https://github.com/discourse/discourse). This example will
-create all assets required to utilize AWS services. The discourse site will be automatically setup with an initial admin
-user. An OpenID plugin is set up to allow users to login via [Amazon Cognito](https://aws.amazon.com/cognito/).
+create all assets required to utilize AWS services. The Discourse site will be automatically setup with an initial admin
+user and an OpenID plugin is set up to allow users to register and login via [Amazon Cognito](https://aws.amazon.com/cognito/).
 
 ## Architecture
 <img alt="Architecture" src="./images/architecture.jpeg" />
