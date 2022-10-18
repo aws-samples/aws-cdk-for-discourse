@@ -7,16 +7,16 @@ user. An OpenID plugin is set up to allow users to login via [Amazon Cognito](ht
 ## Architecture
 <img alt="Architecture" src="./images/architecture.jpeg" />
 
-1. [Amazon CloudFront](https://aws.amazon.com/cloudfront/) is used for CDN via S3 and front for the application load balancer
-2. [Amazon Route 53](https://aws.amazon.com/route53/) holds the hosted zone for DNS management to help create verified outbound email domains along with domain certificates
+1. [Amazon CloudFront](https://aws.amazon.com/cloudfront/) is used for CDN via S3 and the application load balancer
+2. [Amazon Route 53](https://aws.amazon.com/route53/) holds the hosted zone for DNS management to create verified outbound email domains along with domain certificates
 3. [Amazon S3](https://aws.amazon.com/route53/) holds user upload files and static assets in one bucket along with Discourse backups in another bucket
 4. [AWS Certificate Manager](https://aws.amazon.com/certificate-manager/) is used to create a DNS validated certificate
-5. [AWS Secrets Manager](https://aws.amazon.com/secrets-manager/) holds the initial setup credentials and created database credentials
+5. [AWS Secrets Manager](https://aws.amazon.com/secrets-manager/) holds the initial setup credentials and created database credentials.
 6. [Amazon Cogntio](https://aws.amazon.com/cognito/) user pools are used via OpenID
-7. [Amazon SES](https://aws.amazon.com/ses/) will handle outbound email notifications
-8. [AWS Systems Manager](https://aws.amazon.com/systems-manager/) Session Manager is used to connect to internal instances
+7. [Amazon SES](https://aws.amazon.com/ses/) handles outbound email notifications
+8. [AWS Systems Manager](https://aws.amazon.com/systems-manager/) Session Manager is used to connect to internal instances for debugging purposes
 9. [AWS Auto Scaling](https://aws.amazon.com/autoscaling/) will create the desired number of instances in the desired availability zones
-10. [Amazon EC2](https://aws.amazon.com/pm/ec2/) instances are bootstrapped via a user data script which pulls down the latest stable version of Discourse and sets up the app.yml then launches the [Discourse docker image](https://hub.docker.com/r/bitnami/discourse)
+10. [Amazon EC2](https://aws.amazon.com/pm/ec2/) instances are bootstrapped via a user data script which pulls down the latest stable version of Discourse and sets up the app.yml then launches the [Discourse docker image](https://hub.docker.com/r/bitnami/discourse).
 11. [Amazon RDS](https://aws.amazon.com/rds/) Aurora serverless V2 Postgres database stores user details and posts
 12. [Amazon ElastiCache for Redis](https://aws.amazon.com/elasticache/redis/) is used as a caching layer
 
@@ -44,18 +44,18 @@ aws s3control put-public-access-block \
     3. DISCOURSE_ADMIN_EMAIL - The email address for the initial admin user
     4. DISCOURSE_ADMIN_PASSWORD - The password for the initial admin user
     5. DISCOURSE_ADMIN_USERNAME - The username for the initial discourse user
-        1. Note this is a discourse login and not linked to cognito. This is required when setting up discourse
+        1. Note this is a discourse login and is not linked to cognito.
 3. Edit the cdk-command.sh with information required
     1. CDK_DEPLOY_DISCOURSE_ACCOUNT - The AWS account used for this deployment
     2. CDK_DEPLOY_DISCOURSE_REGION - The AWS region used for this deployment
-    3. CDK_DEPLOY_DISCOURSE_STACK_ID - The stack id can be modified to allow for CI/CD and multiple different deployments. If not value is set the default value of 'Discourse' is used.
+    3. CDK_DEPLOY_DISCOURSE_STACK_ID - The stack id can be modified to allow for CI/CD and multiple different deployments. If no value is set the default value of 'Discourse' is used.
     4. CDK_DEPLOY_DISCOURSE_HOSTED_ZONE_ID - The Route 53 hosted zone id
     5. CDK_DEPLOY_DISCOURSE_HOSTED_ZONE_NAME - The Route 53 hosted zone name
     6. CDK_DEPLOY_DISCOURSE_DOMAIN_NAME - The domain name to use for this instance of discourse for example 'discourse.example.com'
     7. CDK_DEPLOY_DISCOURSE_SES_SMTP_DOMAIN_NAME - The domain name to use for SES SMTP emails
     8. CDK_DEPLOY_DISCOURSE_NOTIFICATION_EMAIL - The email address for outbound notification emails from the Discourse system
-    9. CDK_DEPLOY_DISCOURSE_DEVELOPER_EMAILS - details
-    10. CDK_DEPLOY_DISCOURSE_COGNITO_AUTH_SUB_DOMAIN_NAME - details
+    9. CDK_DEPLOY_DISCOURSE_DEVELOPER_EMAILS - A list of admin account email addresses separated by commas
+    10. CDK_DEPLOY_DISCOURSE_COGNITO_AUTH_SUB_DOMAIN_NAME - [Amazon Cognito domain for the hosted UI](https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools-assign-domain-prefix.html#cognito-user-pools-assign-domain-prefix-step-1)
     11. CDK_DEPLOY_DISCOURSE_SETTINGS_SECRET_ARN - 'arn:aws:secretsmanager:{region}:{account}:secret:{secret}
     12. CDK_DEPLOY_DISCOURSE_CIDR - The CIDR block to use when creating the VPC
     13. CDK_DEPLOY_DISCOURSE_CLOUDFRONT_ALB_HEADER_CHECK_HEADER - This header name is used to [restrict access](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/restrict-access-to-load-balancer.html) to the ALB from just CloudFront. If this environment variable is not found a default value of 'X-Discourse-ALB-Check' is used.
@@ -65,18 +65,18 @@ aws s3control put-public-access-block \
     1. The EC2 instance will set up the database structure and push assets to the S3 bucket prior to starting up the Discourse server
 
 ## Notes
-1. You can log into EC2 instance via Session Manager
-2. Once logged in you require `sudo -s` for most commands
+1. You can log into EC2 instances via Session Manager
+2. Once logged in you will require `sudo -s` for most commands
 3. Discourse is installed in the folder `/var/discourse`
 4. Running `. discourse-env` in the `/var/discourse` folder will set up the current shell session environment variables
-5. To check if the docker is running execute the command `docker ps`
+5. To check if docker is running execute the command `docker ps`
 6. EC2 instance startup logs are located at `/var/log/cloud-init-output.log` and can be helpful to determine the actions taken by the user data startup script. 
    1. This log may also contain any errors that occurred on startup.
-7. You can run various docker commands via the Discourse helper script `./launcher {command} app`
-    1. For instance `./launcher enter app` will put your into the docker instance shell
-    2. `./launcher logs app` will display the logs
-8. Your accounts SES (simple email service) will only send email to verified addresses unless validated for production.
-   1. Via the console you can add your own email to the verified list.
+7. You can run various docker commands via the Discourse helper script `./launcher {command} app` for instance:
+    1. `./launcher enter app` will put you into the discourse docker instance shell
+    2. `./launcher logs app` will display the discourse docker app logs
+8. Your accounts SES (simple email service) will only send email to [verified addresses](https://docs.aws.amazon.com/ses/latest/dg/verify-addresses-and-domains.html) unless [validated for production](https://docs.aws.amazon.com/ses/latest/dg/request-production-access.html).
+   1. Via the console you can add your own email to the verified list for testing
    
 ## Resource Cleanup
 ### CloudFormation
