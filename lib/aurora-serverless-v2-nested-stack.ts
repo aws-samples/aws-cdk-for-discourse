@@ -1,5 +1,5 @@
 import {Construct} from 'constructs';
-import {CfnResource, NestedStack, NestedStackProps} from "aws-cdk-lib";
+import {Aspects, CfnResource, NestedStack, NestedStackProps} from "aws-cdk-lib";
 import {InstanceType, SecurityGroup, SubnetConfiguration, Vpc} from "aws-cdk-lib/aws-ec2";
 import {
     AuroraPostgresEngineVersion,
@@ -43,36 +43,15 @@ export class AuroraServerlessV2NestedStack extends NestedStack {
             defaultDatabaseName: 'discourse',
             instances: dbClusterInstanceCount
         });
-        const applyScalingAction = {
-            service: "RDS",
-            action: "modifyDBCluster",
-            parameters: {
-                DBClusterIdentifier: this.rdsCluster.clusterIdentifier,
-                ServerlessV2ScalingConfiguration: {
-                    MinCapacity: 2,
-                    MaxCapacity: 16,
-                },
+        Aspects.of(this.rdsCluster).add({
+            visit(node) {
+                if (node instanceof CfnDBCluster) {
+                    node.serverlessV2ScalingConfiguration = {
+                        minCapacity: 2,
+                        maxCapacity: 16,
+                    }
+                }
             },
-            physicalResourceId: PhysicalResourceId.of(this.rdsCluster.clusterIdentifier)
-        };
-
-        // Create a custom resource to apply the scaling configuration.
-        const configurator = new AwsCustomResource(this, id + "AuroraScaling", {
-            onCreate: applyScalingAction,
-            onUpdate: applyScalingAction,
-            policy: AwsCustomResourcePolicy.fromSdkCalls({
-                resources: AwsCustomResourcePolicy.ANY_RESOURCE,
-            }),
         });
-
-        const cfnCluster = this.rdsCluster.node.defaultChild as CfnDBCluster;
-        cfnCluster.addPropertyOverride("EngineMode", "provisioned");
-        configurator.node.addDependency(cfnCluster);
-
-        const cfnConfigurator = configurator.node.findChild("Resource").node.defaultChild as CfnResource;
-        for (let i = 1; i <= dbClusterInstanceCount; i++) {
-            const instance = this.rdsCluster.node.findChild(`Instance${i}`) as CfnDBInstance;
-            instance.addDependsOn(cfnConfigurator);
-        }
     }
 }
