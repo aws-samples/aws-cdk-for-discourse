@@ -14,6 +14,7 @@ import {
 
 export class CognitoNestedStack extends NestedStack {
     userPool: UserPool;
+    userPoolDomain: UserPoolDomain;
     userPoolClient: UserPoolClient;
 
     constructor(scope: Construct, id: string, props?: NestedStackProps) {
@@ -68,12 +69,11 @@ export class CognitoNestedStack extends NestedStack {
             }
         });
 
-        new UserPoolDomain(this, id + "UserPoolDomain", {
-            userPool: this.userPool,
-            cognitoDomain: {
-                domainPrefix: process.env.CDK_DEPLOY_DISCOURSE_COGNITO_AUTH_SUB_DOMAIN_NAME || ''
+        this.userPoolDomain = this.userPool.addDomain(id + "UserPoolDomain", { 
+            cognitoDomain: { 
+                domainPrefix: process.env.CDK_DEPLOY_DISCOURSE_COGNITO_AUTH_SUB_DOMAIN_NAME || '' 
             }
-        });
+        })
 
         const clientReadAttributes = (new ClientAttributes()).withStandardAttributes({
             address: true,
