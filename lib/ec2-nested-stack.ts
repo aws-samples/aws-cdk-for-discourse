@@ -182,7 +182,7 @@ export class EC2NestedStack extends NestedStack {
             "echo -e 'export DISCOURSE_OPENID_CONNECT_CLIENT_ID=" + props.userPoolClientId + "' >> discourse-env",
             "echo -e 'export DISCOURSE_OPENID_CONNECT_CLIENT_SECRET=$(aws cognito-idp describe-user-pool-client --region " + this.region + " --user-pool-id=" + props.userPoolId + " --client-id=" + props.userPoolClientId + " --query UserPoolClient.ClientSecret --output text)' >> discourse-env",
             "echo -e 'export DISCOURSE_OPENID_CONNECT_DISCOVERY_DOCUMENT=https://cognito-idp." + this.region + ".amazonaws.com/" + props.userPoolId + "/.well-known/openid-configuration' >> discourse-env",
-            "echo -e 'docker login -u $DOCKER_USER -p $DOCKER_PASSWORD' >> discourse-env",
+            "echo -e 'docker login -u $DOCKER_USER --password-stdin <<< $DOCKER_PASSWORD' >> discourse-env",
             "chmod +x discourse-env",
             "echo -e 'psql -h $DISCOURSE_DB_HOST -U $DISCOURSE_DB_USERNAME' > psqlconnect",
             "chmod +x psqlconnect",
